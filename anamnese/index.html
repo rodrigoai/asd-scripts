@@ -1,0 +1,1613 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Anamnese Otimizado</title>
+    <style>
+        /* --- Estilos para Tela (Preenchimento) --- */
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f7f7f7;
+            color: #333;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            font-weight: 600;
+        }
+
+        form {
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 25px;
+            background: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.07);
+        }
+
+        fieldset {
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            padding: 20px;
+            margin-bottom: 25px;
+        }
+
+        legend {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #0056b3;
+            padding: 0 10px;
+            margin-left: 5px;
+        }
+
+        h3 {
+            font-size: 1.15em;
+            color: #333;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            margin-top: 15px;
+        }
+        
+        /* --- O NOVO SISTEMA DE GRID --- */
+
+        /* Grid principal para os campos dentro de um fieldset */
+        .form-grid {
+            display: grid;
+            /* Cria colunas automáticas de no mínimo 280px */
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 15px 20px; /* 15px de espaço vertical, 20px horizontal */
+        }
+        
+        /* O contêiner para um grupo de label/input */
+        .field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px; /* Espaço entre label e input */
+        }
+
+        /* Classe para fazer um campo ocupar a largura total */
+        .full-width {
+            grid-column: 1 / -1;
+        }
+
+        /* Grid aninhado para campos curtos (a principal otimização) */
+        .nested-grid {
+            display: grid;
+            gap: 10px 15px;
+            align-items: end;
+        }
+        .nested-grid-2 { grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); }
+        .nested-grid-3 { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); }
+        .nested-grid-4 { grid-template-columns: repeat(auto-fit, minmax(100px, 1fr)); }
+        .nested-grid-5 { grid-template-columns: repeat(auto-fit, minmax(80px, 1fr)); }
+        
+        /* --- --- */
+
+        label {
+            font-weight: 500;
+            font-size: 0.9em;
+            color: #444;
+        }
+
+        input[type="text"],
+        input[type="date"],
+        input[type="tel"],
+        textarea {
+            width: 100%;
+            padding: 9px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box; 
+            font-size: 0.95em;
+        }
+        
+        input[type="text"]:focus,
+        input[type="date"]:focus,
+        input[type="tel"]:focus,
+        textarea:focus {
+            border-color: #007bff;
+            box-shadow: 0 0 0 2px rgba(0,123,255,0.2);
+            outline: none;
+        }
+
+        textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .radio-group {
+            padding: 10px;
+            border: 1px solid #eee;
+            border-radius: 4px;
+            background: #fafafa;
+        }
+        
+        .radio-group label {
+            display: inline-block;
+            font-weight: normal;
+            font-size: 0.95em;
+            margin-left: 4px;
+            margin-right: 15px;
+            margin-top: 0;
+        }
+        
+        .radio-group input[type="radio"] {
+            margin-right: 4px;
+            vertical-align: middle;
+        }
+        
+        .radio-group-label {
+            display: block;
+            font-weight: 500;
+            font-size: 0.9em;
+            color: #444;
+            margin-bottom: 6px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+
+        th, td {
+            border: 1px solid #ccc;
+            padding: 8px;
+            text-align: left;
+            vertical-align: top;
+        }
+
+        th {
+            background-color: #f2f2f2;
+            font-weight: 600;
+            font-size: 0.9em;
+        }
+
+        td input[type="text"] {
+            padding: 6px;
+            font-size: 0.9em;
+        }
+
+        .print-button {
+            display: block;
+            width: 250px;
+            padding: 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            transition: background-color 0.2s;
+        }
+
+        .print-button:hover {
+            background-color: #0056b3;
+        }
+
+        /* --- Estilos para Botões de Ação --- */
+        .button-container {
+            display: flex;
+            flex-wrap: wrap; /* Permite quebrar linha em telas pequenas */
+            gap: 15px;
+            justify-content: center;
+            max-width: 900px;
+            margin: 20px auto 10px;
+            align-items: center;
+        }
+
+        .button-save, .button-clear {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 15px;
+            font-weight: 600;
+            color: white;
+            transition: all 0.2s;
+        }
+
+        .button-save {
+            background-color: #28a745; /* Verde */
+        }
+        .button-save:hover {
+            background-color: #218838;
+        }
+
+        .button-clear {
+            background-color: #dc3545; /* Vermelho */
+        }
+        .button-clear:hover {
+            background-color: #c82333;
+        }
+        
+        /* Estilo especial para confirmação de limpeza */
+        .button-clear.button-danger-confirm {
+            background-color: #ffc107; /* Amarelo alerta */
+            color: #333;
+            font-weight: bold;
+        }
+        
+        #save-status {
+            font-size: 0.9em;
+            color: #555;
+            font-style: italic;
+            min-height: 1.2em;
+        }
+
+
+        /* --- Estilos para Mobile --- */
+        @media (max-width: 640px) {
+            body {
+                padding: 10px; /* Reduz padding do corpo */
+                -webkit-text-size-adjust: 100%; /* Previne zoom automático em iOS */
+            }
+
+            form {
+                padding: 15px; /* Reduz padding do formulário */
+            }
+
+            h1 {
+                font-size: 1.6em; /* Tamanho de título menor */
+            }
+
+            legend {
+                font-size: 1.25em; /* Tamanho de legenda menor */
+            }
+
+            /* Força todos os grids aninhados a terem uma única coluna */
+            .nested-grid,
+            .nested-grid-2,
+            .nested-grid-3,
+            .nested-grid-4,
+            .nested-grid-5 {
+                grid-template-columns: 1fr;
+                gap: 15px; /* Espaço vertical consistente */
+            }
+            
+            /* O grid principal também deve ter um gap menor no mobile */
+            .form-grid {
+                grid-template-columns: 1fr; /* Força coluna única no grid principal também */
+                gap: 15px; 
+            }
+
+            .print-button {
+                width: 100%; /* Botão ocupa a largura total */
+            }
+            
+            textarea {
+                min-height: 80px; /* Reduz altura mínima no mobile */
+            }
+
+            table,
+            th,
+            td {
+                font-size: 0.9em; /* Ajusta a fonte da tabela em mobile para leitura */
+            }
+
+            td input[type="text"] {
+                font-size: 1em; /* Garante que o input da tabela seja legível */
+            }
+        }
+
+        /* --- Estilos para Impressão --- */
+        @media print {
+            @page {
+                size: A4;
+                margin: 0.7in; /* Margem mais confortável para impressão */
+            }
+
+            body {
+                background-color: #fff;
+                color: #000;
+                margin: 0;
+                padding: 0;
+                font-size: 9pt;
+                font-family: 'Times New Roman', Times, serif;
+                line-height: 1.4;
+            }
+
+            h1 { font-size: 16pt; }
+            legend { font-size: 11pt; padding: 0 5px; }
+            h3 { font-size: 10pt; }
+
+            form {
+                max-width: 100%;
+                margin: 0;
+                padding: 0;
+                box-shadow: none;
+                border: none;
+            }
+
+            fieldset {
+                border: 1px solid #999;
+                margin-bottom: 10px;
+                padding: 12px;
+                page-break-inside: avoid;
+            }
+
+            .print-button {
+                display: none;
+            }
+            
+            .form-grid, .nested-grid {
+                display: grid;
+                gap: 8px 12px;
+                grid-template-columns: 1fr 1fr; /* Força 2 colunas para economizar espaço */
+            }
+
+            /* Força grids aninhados a terem mais colunas */
+            .nested-grid-3, .nested-grid-4, .nested-grid-5 {
+                grid-template-columns: 1fr 1fr 1fr 1fr;
+            }
+
+            .field-group {
+                gap: 2px;
+                page-break-inside: avoid;
+            }
+
+            label {
+                font-size: 9pt;
+            }
+
+            input[type="text"],
+            input[type="date"],
+            input[type="tel"] {
+                border: none;
+                border-bottom: 1px dotted #333;
+                border-radius: 0;
+                padding: 2px 0;
+                background: #fff;
+                font-size: 9pt;
+            }
+
+            textarea {
+                border: 1px dotted #333;
+                background: #fdfdfd;
+                min-height: 60px; /* Altura menor para impressão */
+                padding: 3px;
+                font-size: 9pt;
+            }
+
+            .radio-group {
+                border: 1px dotted #999;
+                background: #fff;
+                padding: 4px;
+            }
+            .radio-group label { font-size: 9pt; margin-right: 8px; }
+
+            input[type="radio"]:checked + label {
+                font-weight: bold;
+            }
+
+            table, th, td {
+                border: 1px solid #666;
+                font-size: 8pt;
+                padding: 3px;
+            }
+            
+            th { background-color: #eee; }
+
+            td input[type="text"] {
+                border: none;
+                border-bottom: 1px dotted #555;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Formulário de Anamnese</h1>
+
+    <div class="button-container">
+        <button type="button" class="print-button" onclick="window.print()">Imprimir / Salvar como PDF</button>
+        <button type="button" id="saveButton" class="button-save">Salvar Agora</button>
+        <button type="button" id="clearButton" class="button-clear">Limpar Formulário</button>
+        <span id="save-status"></span>
+    </div>
+
+    <form id="anamneseForm">
+
+        <div style="margin-bottom: 20px;" class="field-group">
+            <label for="data_entrevista">Data da entrevista:</label>
+            <input type="date" id="data_entrevista" name="data_entrevista" style="max-width: 200px;">
+        </div>
+
+        <!-- 1) Dados de identificação -->
+        <fieldset>
+            <legend>1) Dados de identificação</legend>
+            <div class="form-grid">
+                <div class="field-group full-width">
+                    <label for="nome_paciente">Nome:</label>
+                    <input type="text" id="nome_paciente" name="nome_paciente">
+                </div>
+                
+                <div class="field-group full-width">
+                    <div class="nested-grid nested-grid-4">
+                        <div class="field-group">
+                            <label for="nascimento_paciente">Data de nascimento:</label>
+                            <input type="date" id="nascimento_paciente" name="nascimento_paciente">
+                        </div>
+                        <div class="field-group">
+                            <label for="idade_paciente">Idade:</label>
+                            <input type="text" id="idade_paciente" name="idade_paciente">
+                        </div>
+                        <div class="field-group">
+                            <label for="naturalidade_paciente">Naturalidade:</label>
+                            <input type="text" id="naturalidade_paciente" name="naturalidade_paciente">
+                        </div>
+                         <div class="field-group radio-group">
+                            <span class="radio-group-label">Sexo:</span>
+                            <div>
+                                <input type="radio" id="sexo_m" name="sexo_paciente" value="M">
+                                <label for="sexo_m">M</label>
+                                <input type="radio" id="sexo_f" name="sexo_paciente" value="F">
+                                <label for="sexo_f">F</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group full-width">
+                    <label for="endereco_paciente">Endereço:</label>
+                    <input type="text" id="endereco_paciente" name="endereco_paciente">
+                </div>
+
+                <div class="field-group full-width">
+                     <div class="nested-grid nested-grid-3">
+                        <div class="field-group">
+                            <label for="telefones_paciente">Telefones:</label>
+                            <input type="tel" id="telefones_paciente" name="telefones_paciente">
+                        </div>
+                        <div class="field-group">
+                            <label for="escola_paciente">Escola que frequenta:</label>
+                            <input type="text" id="escola_paciente" name="escola_paciente">
+                        </div>
+                        <div class="field-group">
+                            <label for="escolaridade_paciente">Escolaridade:</label>
+                            <input type="text" id="escolaridade_paciente" name="escolaridade_paciente">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group full-width">
+                    <label for="encaminhamento">Encaminhamento ao psicopedagogo feito por:</label>
+                    <input type="text" id="encaminhamento" name="encaminhamento">
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- 2) Dados pessoais dos familiares -->
+        <fieldset>
+            <legend>2) Dados pessoais dos familiares</legend>
+            
+            <h3>a) Pai</h3>
+            <div class="form-grid">
+                <div class="field-group full-width">
+                    <label for="nome_pai">Nome:</label>
+                    <input type="text" id="nome_pai" name="nome_pai">
+                </div>
+                <div class="field-group full-width">
+                    <div class="nested-grid nested-grid-4">
+                        <div class="field-group">
+                            <label for="nascimento_pai">Data de nascimento:</label>
+                            <input type="date" id="nascimento_pai" name="nascimento_pai">
+                        </div>
+                        <div class="field-group">
+                            <label for="idade_pai">Idade:</label>
+                            <input type="text" id="idade_pai" name="idade_pai">
+                        </div>
+                        <div class="field-group">
+                            <label for="ocupacao_pai">Ocupação:</label>
+                            <input type="text" id="ocupacao_pai" name="ocupacao_pai">
+                        </div>
+                        <div class="field-group">
+                            <label for="naturalidade_pai">Naturalidade:</label>
+                            <input type="text" id="naturalidade_pai" name="naturalidade_pai">
+                        </div>
+                    </div>
+                </div>
+                <div class="field-group full-width">
+                    <label for="endereco_pai">Endereço:</label>
+                    <input type="text" id="endereco_pai" name="endereco_pai">
+                </div>
+                <div class="field-group full-width">
+                    <div class="nested-grid nested-grid-2">
+                        <div class="field-group">
+                            <label for="telefones_pai">Telefones:</label>
+                            <input type="tel" id="telefones_pai" name="telefones_pai">
+                        </div>
+                        <div class="field-group">
+                            <label for="escolaridade_pai">Escolaridade:</label>
+                            <input type="text" id="escolaridade_pai" name="escolaridade_pai">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>b) Mãe</h3>
+            <div class="form-grid">
+                <div class="field-group full-width">
+                    <label for="nome_mae">Nome:</label>
+                    <input type="text" id="nome_mae" name="nome_mae">
+                </div>
+                <div class="field-group full-width">
+                    <div class="nested-grid nested-grid-4">
+                        <div class="field-group">
+                            <label for="nascimento_mae">Data de nascimento:</label>
+                            <input type="date" id="nascimento_mae" name="nascimento_mae">
+                        </div>
+                        <div class="field-group">
+                            <label for="idade_mae">Idade:</label>
+                            <input type="text" id="idade_mae" name="idade_mae">
+                        </div>
+                        <div class="field-group">
+                            <label for="ocupacao_mae">Ocupação:</label>
+                            <input type="text" id="ocupacao_mae" name="ocupacao_mae">
+                        </div>
+                        <div class="field-group">
+                            <label for="naturalidade_mae">Naturalidade:</label>
+                            <input type="text" id="naturalidade_mae" name="naturalidade_mae">
+                        </div>
+                    </div>
+                </div>
+                <div class="field-group full-width">
+                    <label for="endereco_mae">Endereço:</label>
+                    <input type="text" id="endereco_mae" name="endereco_mae">
+                </div>
+                <div class="field-group full-width">
+                    <div class="nested-grid nested-grid-2">
+                        <div class="field-group">
+                            <label for="telefones_mae">Telefones:</label>
+                            <input type="tel" id="telefones_mae" name="telefones_mae">
+                        </div>
+                        <div class="field-group">
+                            <label for="escolaridade_mae">Escolaridade:</label>
+                            <input type="text" id="escolaridade_mae" name="escolaridade_mae">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <h3>c) Responsável (em caso de não serem os pais)</h3>
+            <div class="form-grid">
+                <div class="field-group full-width">
+                    <label for="nome_resp">Nome:</label>
+                    <input type="text" id="nome_resp" name="nome_resp">
+                </div>
+                <div class="field-group full-width">
+                    <div class="nested-grid nested-grid-4">
+                        <div class="field-group">
+                            <label for="nascimento_resp">Data de nascimento:</label>
+                            <input type="date" id="nascimento_resp" name="nascimento_resp">
+                        </div>
+                        <div class="field-group">
+                            <label for="idade_resp">Idade:</label>
+                            <input type="text" id="idade_resp" name="idade_resp">
+                        </div>
+                        <div class="field-group">
+                            <label for="ocupacao_resp">Ocupação:</label>
+                            <input type="text" id="ocupacao_resp" name="ocupacao_resp">
+                        </div>
+                        <div class="field-group">
+                            <label for="naturalidade_resp">Naturalidade:</label>
+                            <input type="text" id="naturalidade_resp" name="naturalidade_resp">
+                        </div>
+                    </div>
+                </div>
+                 <div class="field-group full-width">
+                    <label for="endereco_resp">Endereço:</label>
+                    <input type="text" id="endereco_resp" name="endereco_resp">
+                </div>
+                <div class="field-group full-width">
+                    <div class="nested-grid nested-grid-3">
+                        <div class="field-group">
+                            <label for="telefones_resp">Telefones:</label>
+                            <input type="tel" id="telefones_resp" name="telefones_resp">
+                        </div>
+                        <div class="field-group">
+                            <label for="parentesco_resp">Grau de parentesco:</label>
+                            <input type="text" id="parentesco_resp" name="parentesco_resp">
+                        </div>
+                        <div class="field-group">
+                            <label for="escolaridade_resp">Escolaridade:</label>
+                            <input type="text" id="escolaridade_resp" name="escolaridade_resp">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <h3>d) Irmãos (colocar os dados em ordem cronológica)</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Idade</th>
+                        <th>Escolaridade</th>
+                        <th>Como é a relação com a criança?</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" name="irmao1_nome"></td>
+                        <td><input type="text" name="irmao1_idade"></td>
+                        <td><input type="text" name="irmao1_escolaridade"></td>
+                        <td><input type="text" name="irmao1_relacao"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" name="irmao2_nome"></td>
+                        <td><input type="text" name="irmao2_idade"></td>
+                        <td><input type="text" name="irmao2_escolaridade"></td>
+                        <td><input type="text" name="irmao2_relacao"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" name="irmao3_nome"></td>
+                        <td><input type="text" name="irmao3_idade"></td>
+                        <td><input type="text" name="irmao3_escolaridade"></td>
+                        <td><input type="text" name="irmao3_relacao"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </fieldset>
+
+        <!-- 3) Motivo da consulta -->
+        <fieldset>
+            <legend>3) Motivo da consulta</legend>
+            <div class="form-grid">
+                <div class="field-group full-width">
+                    <label for="motivo_consulta">(Queixa? / Há quanto tempo? / Causa atribuída / Causas descobertas? / Quem diagnosticou?)</label>
+                    <textarea id="motivo_consulta" name="motivo_consulta"></textarea>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- 4) Atitudes frente às queixas -->
+        <fieldset>
+            <legend>4) Atitudes frente às queixas</legend>
+            <div class="form-grid">
+                <div class="field-group full-width">
+                    <label for="atitude_mae">Mãe:</label>
+                    <textarea id="atitude_mae" name="atitude_mae" rows="3"></textarea>
+                </div>
+                <div class="field-group full-width">
+                    <label for="atitude_pai">Pai:</label>
+                    <textarea id="atitude_pai" name="atitude_pai" rows="3"></textarea>
+                </div>
+                <div class="field-group full-width">
+                    <label for="atitude_parentes">Parentes:</label>
+                    <textarea id="atitude_parentes" name="atitude_parentes" rows="3"></textarea>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- 5) Descrição do filho -->
+        <fieldset>
+            <legend>5) Descrição do filho</legend>
+            <div class="form-grid">
+                <div class="field-group full-width">
+                    <label for="descricao_filho">("Me ajudem a imaginar o seu filho. Me contem como ele é, para que eu o conheça melhor.")</label>
+                    <textarea id="descricao_filho" name="descricao_filho"></textarea>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- 6) Casal -->
+        <fieldset>
+            <legend>6) Casal</legend>
+            <div class="form-grid">
+                <div class="field-group full-width">
+                    <div class="nested-grid nested-grid-4">
+                        <div class="field-group">
+                            <label for="tempo_casados">Tempo de casados:</label>
+                            <input type="text" id="tempo_casados" name="tempo_casados">
+                        </div>
+                        <div class="field-group">
+                            <label for="aborto">Houve algum aborto?</label>
+                            <input type="text" id="aborto" name="aborto">
+                        </div>
+                        <div class="field-group">
+                            <label for="tempo_nascimento_filho">Tempo até o nascimento:</label>
+                            <input type="text" id="tempo_nascimento_filho" name="tempo_nascimento_filho">
+                        </div>
+                        <div class="field-group">
+                            <label for="filho_desejado">O filho foi desejado?</label>
+                            <input type="text" id="filho_desejado" name="filho_desejado">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- 7) Gestação -->
+        <fieldset>
+            <legend>7) Gestação</legend>
+            <div class="form-grid">
+                <div class="field-group">
+                    <label for="pre_natal">Fez acompanhamento pré-natal?</label>
+                    <input type="text" id="pre_natal" name="pre_natal">
+                </div>
+                <div class="field-group">
+                    <label for="duracao_gestacao">Duração da gestação:</label>
+                    <input type="text" id="duracao_gestacao" name="duracao_gestacao">
+                </div>
+                <div class="field-group full-width">
+                    <label for="problemas_organicos_gestacao">Houveram problemas orgânicos?</label>
+                    <textarea id="problemas_organicos_gestacao" name="problemas_organicos_gestacao" rows="2"></textarea>
+                </div>
+                <div class="field-group full-width">
+                    <label for="medicamentos_gestacao">Fez uso de medicamentos?</label>
+                    <textarea id="medicamentos_gestacao" name="medicamentos_gestacao" rows="2"></textarea>
+                </div>
+                <div class="field-group full-width">
+                    <label for="problemas_emocionais_gestacao">Houveram problemas emocionais?</label>
+                    <textarea id="problemas_emocionais_gestacao" name="problemas_emocionais_gestacao" rows="2"></textarea>
+                </div>
+                <div class="field-group full-width">
+                    <label for="como_trabalhados_gestacao">Como foram trabalhados?</label>
+                    <textarea id="como_trabalhados_gestacao" name="como_trabalhados_gestacao" rows="2"></textarea>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- 8) Parto -->
+        <fieldset>
+            <legend>8) Parto</legend>
+            <div class="form-grid">
+                <div class="field-group radio-group full-width">
+                    <span class="radio-group-label">Tipo de parto:</span>
+                    <div>
+                        <input type="radio" id="parto_normal" name="tipo_parto" value="Normal">
+                        <label for="parto_normal">Normal</label>
+                        <input type="radio" id="parto_cesariana" name="tipo_parto" value="Cesariana">
+                        <label for="parto_cesariana">Cesariana</label>
+                        <input type="radio" id="parto_outro_radio" name="tipo_parto" value="Outro">
+                        <label for="parto_outro_radio">Outro:</label>
+                        <input type="text" id="parto_outro_desc" name="parto_outro_desc" placeholder="Descreva" style="width: 200px; display: inline-block; padding: 6px;">
+                    </div>
+                </div>
+                
+                <div class="field-group full-width">
+                    <label for="duracao_parto">Duração do parto (desde os primeiros sinais):</label>
+                    <input type="text" id="duracao_parto" name="duracao_parto">
+                </div>
+                
+                <div class="field-group full-width">
+                    <label for="dificuldades_parto">Dificuldades no parto?</label>
+                    <textarea id="dificuldades_parto" name="dificuldades_parto" rows="2"></textarea>
+                </div>
+                
+                <div class="field-group full-width">
+                    <div class="nested-grid nested-grid-5">
+                        <div class="field-group">
+                            <label for="peso_nascimento">Peso:</label>
+                            <input type="text" id="peso_nascimento" name="peso_nascimento">
+                        </div>
+                        <div class="field-group">
+                            <label for="altura_nascimento">Altura:</label>
+                            <input type="text" id="altura_nascimento" name="altura_nascimento">
+                        </div>
+                        <div class="field-group">
+                            <label for="apgar_nascimento">APGAR:</label>
+                            <input type="text" id="apgar_nascimento" name="apgar_nascimento">
+                        </div>
+                        <div class="field-group">
+                            <label for="chorou_logo">Chorou logo?</label>
+                            <input type="text" id="chorou_logo" name="chorou_logo">
+                        </div>
+                        <div class="field-group">
+                            <label for="anoxia">Anoxia?</label>
+                            <input type="text" id="anoxia" name="anoxia">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group full-width">
+                    <div class="nested-grid nested-grid-3">
+                        <div class="field-group radio-group">
+                            <span class="radio-group-label">Foi usado o fórceps?</span>
+                            <div>
+                                <input type="radio" id="forceps_sim" name="forceps" value="Sim"><label for="forceps_sim">Sim</label>
+                                <input type="radio" id="forceps_nao" name="forceps" value="Não"><label for="forceps_nao">Não</label>
+                            </div>
+                        </div>
+                        <div class="field-group radio-group">
+                            <span class="radio-group-label">Precisou de oxigênio?</span>
+                            <div>
+                                <input type="radio" id="oxigenio_sim" name="oxigenio" value="Sim"><label for="oxigenio_sim">Sim</label>
+                                <input type="radio" id="oxigenio_nao" name="oxigenio" value="Não"><label for="oxigenio_nao">Não</label>
+                            </div>
+                        </div>
+                        <div class="field-group radio-group">
+                            <span class="radio-group-label">Desenvolveu icterícia?</span>
+                            <div>
+                                <input type="radio" id="ictericia_sim" name="ictericia" value="Sim"><label for="ictericia_sim">Sim</label>
+                                <input type="radio" id="ictericia_nao" name="ictericia" value="Não"><label for="ictericia_nao">Não</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        
+        <!-- 9) Alimentação -->
+        <fieldset>
+            <legend>9) Alimentação</legend>
+            <div class="form-grid">
+                <div class="field-group">
+                    <label for="amamentou_logo">Amamentou logo?</label>
+                    <input type="text" id="amamentou_logo" name="amamentou_logo">
+                </div>
+                <div class="field-group">
+                    <label for="amamentou_ate_quando">Até quando amamentou?</label>
+                    <input type="text" id="amamentou_ate_quando" name="amamentou_ate_quando">
+                </div>
+                <div class="field-group full-width">
+                    <label for="sensacoes_amamentar">Sensações da mãe ao amamentar:</label>
+                    <textarea id="sensacoes_amamentar" name="sensacoes_amamentar" rows="2"></textarea>
+                </div>
+                <div class="field-group full-width">
+                    <label for="atitudes_desmame">Atitudes tomadas para o desmame:</label>
+                    <textarea id="atitudes_desmame" name="atitudes_desmame" rows="2"></textarea>
+                </div>
+                <div class="field-group">
+                    <label for="dificuldade_leite">Dificuldade para aceitar leite?</label>
+                    <input type="text" id="dificuldade_leite" name="dificuldade_leite">
+                </div>
+                <div class="field-group">
+                    <label for="solucao_dificuldade_leite">Como foi solucionada?</label>
+                    <input type="text" id="solucao_dificuldade_leite" name="solucao_dificuldade_leite">
+                </div>
+                <div class="field-group full-width">
+                    <label for="passagem_alimentacao">Passagem da alimentação líquida para pastosa/salgada:</label>
+                    <textarea id="passagem_alimentacao" name="passagem_alimentacao" rows="2"></textarea>
+                </div>
+                <div class="field-group">
+                    <label for="usou_mamadeira">Usou mamadeira?</label>
+                    <input type="text" id="usou_mamadeira" name="usou_mamadeira">
+                </div>
+                <div class="field-group">
+                    <label for="mamadeira_ate_quando">Até quando?</label>
+                    <input type="text" id="mamadeira_ate_quando" name="mamadeira_ate_quando">
+                </div>
+                <div class="field-group full-width">
+                    <label for="problema_rejeicao_alergia">Problema de rejeição ou alergia (leite, sal, etc.)?</label>
+                    <textarea id="problema_rejeicao_alergia" name="problema_rejeicao_alergia" rows="2"></textarea>
+                </div>
+                <div class="field-group full-width">
+                    <label for="alimentacao_atual">Como é atualmente o processo de alimentação?</label>
+                    <textarea id="alimentacao_atual" name="alimentacao_atual" rows="2"></textarea>
+                </div>
+                <div class="field-group full-width">
+                    <div class="nested-grid nested-grid-3">
+                        <div class="field-group">
+                            <label for="aceita_rejeita_alimentos">Aceita ou rejeita alimentos?</label>
+                            <input type="text" id="aceita_rejeita_alimentos" name="aceita_rejeita_alimentos">
+                        </div>
+                        <div class="field-group">
+                            <label for="precisa_forcada">Precisa ser forçada?</label>
+                            <input type="text" id="precisa_forcada" name="precisa_forcada">
+                        </div>
+                        <div class="field-group">
+                            <label for="ritmo_comer">Como é o ritmo para comer?</label>
+                            <input type="text" id="ritmo_comer" name="ritmo_comer">
+                        </div>
+                    </div>
+                </div>
+                <div class="field-group full-width">
+                    <label for="ritual_alimentacao_familia">Como é o ritual de alimentação na família?</label>
+                    <textarea id="ritual_alimentacao_familia" name="ritual_alimentacao_familia" rows="2"></textarea>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- 10) Sono -->
+        <fieldset>
+            <legend>10) Sono</legend>
+            <div class="form-grid">
+                <div class="field-group full-width">
+                    <label for="sono_bebe">Como era o sono enquanto bebê?</label>
+                    <textarea id="sono_bebe" name="sono_bebe" rows="2"></textarea>
+                </div>
+                <div class="field-group">
+                    <label for="mudancas_sono">Houve mudanças em relação ao sono?</label>
+                    <input type="text" id="mudancas_sono" name="mudancas_sono">
+                </div>
+                <div class="field-group">
+                    <label for="mudancas_sono_quando">Quando?</label>
+                    <input type="text" id="mudancas_sono_quando" name="mudancas_sono_quando">
+                </div>
+
+                <div class="field-group full-width">
+                    <div class="nested-grid nested-grid-5">
+                        <div class="field-group">
+                            <label for="medos_sono">Tinha medos?</label>
+                            <input type="text" id="medos_sono" name="medos_sono">
+                        </div>
+                        <div class="field-group">
+                            <label for="pesadelos_sono">Pesadelos?</label>
+                            <input type="text" id="pesadelos_sono" name="pesadelos_sono">
+                        </div>
+                        <div class="field-group">
+                            <label for="rangia_dentes">Rangia os dentes?</label>
+                            <input type="text" id="rangia_dentes" name="rangia_dentes">
+                        </div>
+                        <div class="field-group">
+                            <label for="cama_pais">Ia para a cama dos pais?</label>
+                            <input type="text" id="cama_pais" name="cama_pais">
+                        </div>
+                        <div class="field-group">
+                            <label for="ainda_cama_pais">Ainda vai?</label>
+                            <input type="text" id="ainda_cama_pais" name="ainda_cama_pais">
+                        </div>
+                    </div>
+                </div>
+
+                <div class="field-group">
+                    <label for="horas_sono">Quantas horas por dia dorme?</label>
+                    <input type="text" id="horas_sono" name="horas_sono">
+                </div>
+                
+                <div class="field-group full-width">
+                    <label for="condicoes_dormir">Condições para dormir:</label>
+                    <textarea id="condicoes_dormir" name="condicoes_dormir" rows="2"></textarea>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- 11) Higiene -->
+        <fieldset>
+            <legend>11) Higiene</legend>
+            <div class="form-grid">
+                <div class="field-group">
+                    <label for="banho_sozinho">Quando começou a tomar banho sozinho?</label>
+                    <input type="text" id="banho_sozinho" name="banho_sozinho">
+                </div>
+                <div class="field-group full-width">
+                    <label for="habitos_higiene_atual">Como são seus hábitos de higiene atualmente?</label>
+                    <textarea id="habitos_higiene_atual" name="habitos_higiene_atual" rows="2"></textarea>
+                </div>
+                <div class="field-group">
+                    <label for="controle_esfincteriano_diurno">Controle esfincteriano diurno (quando?):</label>
+                    <input type="text" id="controle_esfincteriano_diurno" name="controle_esfincteriano_diurno">
+                </div>
+                <div class="field-group">
+                    <label for="controle_esfincteriano_noturno">Controle esfincteriano noturno (quando?):</label>
+                    <input type="text" id="controle_esfincteriano_noturno" name="controle_esfincteriano_noturno">
+                </div>
+                <div class="field-group">
+                    <label for="enurese_nunca_controlou">Em caso de enurese: nunca controlou?</label>
+                    <input type="text" id="enurese_nunca_controlou" name="enurese_nunca_controlou">
+                </div>
+                <div class="field-group">
+                    <label for="enurese_deixou_controlar">Deixou de controlar em algum momento?</label>
+                    <input type="text" id="enurese_deixou_controlar" name="enurese_deixou_controlar">
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- 12) Brinquedos -->
+        <fieldset>
+            <legend>12) Brinquedos</legend>
+            <div class="form-grid">
+                <div class="field-group full-width">
+                    <label for="brincava_bebe">Como brincava quando bebê?</label>
+                    <textarea id="brincava_bebe" name="brincava_bebe" rows="2"></textarea>
+                </div>
+                <div class="field-group">
+                    <label for="brinquedo_preferido">Qual era o brinquedo preferido?</label>
+                    <input type="text" id="brinquedo_preferido" name="brinquedo_preferido">
+                </div>
+                <div class="field-group">
+                    <label for="brincava_outras_criancas">Brincava com outras crianças?</label>
+                    <input type="text" id="brincava_outras_criancas" name="brincava_outras_criancas">
+                </div>
+                <div class="field-group full-width">
+                    <label for="preferencias_brincar">Quais as preferências para brincar?</label>
+                    <textarea id="preferencias_brincar" name="preferencias_brincar" rows="2"></textarea>
+                </div>
+                <div class="field-group full-width">
+                    <label for="quando_como_brinca">Quando e como brinca?</label>
+                    <textarea id="quando_como_brinca" name="quando_como_brinca" rows="2"></textarea>
+                </div>
+                <div class="field-group">
+                    <label for="programas_tv">Programas preferidos na TV?</label>
+                    <input type="text" id="programas_tv" name="programas_tv">
+                </div>
+                <div class="field-group">
+                    <label for="tempo_tv">Quanto tempo assiste TV por dia?</label>
+                    <input type="text" id="tempo_tv" name="tempo_tv">
+                </div>
+                <div class="field-group">
+                    <label for="eletronicos_tempo">Usa eletrônicos? Se sim, quanto tempo?</label>
+                    <input type="text" id="eletronicos_tempo" name="eletronicos_tempo">
+                </div>
+                 <div class="field-group">
+                    <label for="eletronicos_motivo_nao">Se não usa, por qual motivo?</label>
+                    <input type="text" id="eletronicos_motivo_nao" name="eletronicos_motivo_nao">
+                </div>
+                <div class="field-group">
+                    <label for="supervisao_brincadeiras">Quem a supervisiona?</label>
+                    <input type="text" id="supervisao_brincadeiras" name="supervisao_brincadeiras">
+                </div>
+            </div>
+        </fieldset>
+        
+        <!-- 13) Esportes, recreação e outras atividades -->
+        <fieldset>
+            <legend>13) Esportes, recreação e outras atividades</legend>
+            <div class="form-grid">
+                <div class="field-group">
+                    <label for="esportes_pratica">Quais os esportes que aprende ou pratica?</label>
+                    <input type="text" id="esportes_pratica" name="esportes_pratica">
+                </div>
+                <div class="field-group">
+                    <label for="relacionamento_esportes">Como se relaciona durante os esportes?</label>
+                    <input type="text" id="relacionamento_esportes" name="relacionamento_esportes">
+                </div>
+                <div class="field-group">
+                    <label for="tempo_esportes">Tempo semanal dedicado aos esportes?</label>
+                    <input type="text" id="tempo_esportes" name="tempo_esportes">
+                </div>
+            </div>
+            
+            <label style="margin-top: 15px; display: block;">Rotina Semanal (Atividades Extra-escolares):</label>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Segunda</th>
+                        <th>Terça</th>
+                        <th>Quarta</th>
+                        <th>Quinta</th>
+                        <th>Sexta</th>
+                        <th>Sábado</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" name="rotina_seg"></td>
+                        <td><input type="text" name="rotina_ter"></td>
+                        <td><input type="text" name="rotina_qua"></td>
+                        <td><input type="text" name="rotina_qui"></td>
+                        <td><input type="text" name="rotina_sex"></td>
+                        <td><input type="text" name="rotina_sab"></td>
+                    </tr>
+                </tbody>
+            </table>
+        </fieldset>
+
+        <!-- 14) Linguagem -->
+        <fieldset>
+            <legend>14) Linguagem</legend>
+            <div class="form-grid">
+                <div class="field-group full-width">
+                    <div class="nested-grid nested-grid-3">
+                        <div class="field-group">
+                            <label for="falavam_bebe">Falavam com o bebê?</label>
+                            <input type="text" id="falavam_bebe" name="falavam_bebe">
+                        </div>
+                        <div class="field-group">
+                            <label for="quando_balbuciar">Quando começou a balbuciar?</label>
+                            <input type="text" id="quando_balbuciar" name="quando_balbuciar">
+                        </div>
+                        <div class="field-group">
+                            <label for="primeiras_palavras">Quando foram as primeiras palavras?</label>
+                            <input type="text" id="primeiras_palavras" name="primeiras_palavras">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="field-group full-width">
+                    <label for="dificuldade_falar">Teve algum tipo de dificuldade para falar?</label>
+                    <textarea id="dificuldade_falar" name="dificuldade_falar" rows="2"></textarea>
+                </div>
+                
+                <div class="field-group full-width">
+                    <label for="atendimento_dificuldade_falar">Fez atendimento terapêutico para fala?</label>
+                    <textarea id="atendimento_dificuldade_falar" name="atendimento_dificuldade_falar" rows="2"></textarea>
+                </div>
+                
+                <div class="field-group">
+                    <label for="e_conversador">É conversador?</label>
+                    <input type="text" id="e_conversador" name="e_conversador">
+                </div>
+                <div class="field-group">
+                    <label for="conversa_com_quem">Com quem mais conversa?</label>
+                    <input type="text" id="conversa_com_quem" name="conversa_com_quem">
+                </div>
+
+                <div class="field-group full-width">
+                    <label for="assunto_conversa">Sobre o que conversa?</label>
+                    <textarea id="assunto_conversa" name="assunto_conversa" rows="2"></textarea>
+                </div>
+                
+                <div class="field-group full-width">
+                    <div class="nested-grid nested-grid-4">
+                        <div class="field-group">
+                            <label for="gosta_perguntar">Gosta de perguntar?</label>
+                            <input type="text" id="gosta_perguntar" name="gosta_perguntar">
+                        </div>
+                        <div class="field-group">
+                            <label for="gosta_cantar">Gosta de cantar?</label>
+                            <input type="text" id="gosta_cantar" name="gosta_cantar">
+                        </div>
+                        <div class="field-group">
+                            <label for="memoriza_musicas">Memoriza músicas?</label>
+                            <input type="text" id="memoriza_musicas" name="memoriza_musicas">
+                        </div>
+                        <div class="field-group">
+                            <label for="gosta_historias">Gosta de ouvir histórias?</label>
+                            <input type="text" id="gosta_historias" name="gosta_historias">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- 15) Escolaridade -->
+        <fieldset>
+            <legend>15) Escolaridade</legend>
+            <div class="form-grid">
+                <div class="field-group full-width">
+                    <div class="nested-grid nested-grid-4">
+                        <div class="field-group">
+                            <label for="entrada_creche">Entrada na creche/berçário?</label>
+                            <input type="text" id="entrada_creche" name="entrada_creche">
+                        </div>
+                        <div class="field-group">
+                            <label for="motivacao_creche">Motivação (creche):</label>
+                            <input type="text" id="motivacao_creche" name="motivacao_creche">
+                        </div>
+                        <div class="field-group">
+                            <label for="contato_ed_infantil">1º contato Ed. Infantil?</label>
+                            <input type="text" id="contato_ed_infantil" name="contato_ed_infantil">
+                        </div>
+                        <div class="field-group">
+                            <label for="idade_ed_infantil">Idade (Ed. Infantil):</label>
+                            <input type="text" id="idade_ed_infantil" name="idade_ed_infantil">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="field-group full-width">
+                    <label for="dificuldades_ed_infantil">Dificuldades na Educação Infantil?</label>
+                    <textarea id="dificuldades_ed_infantil" name="dificuldades_ed_infantil" rows="2"></textarea>
+                </div>
+                
+                <div class="field-group">
+                    <label for="idade_1ano_ef">Idade no 1º ano EF?</label>
+                    <input type="text" id="idade_1ano_ef" name="idade_1ano_ef">
+                </div>
+                <div class="field-group">
+                    <label for="contato_1prof_ef">Contato com 1ª professora do EF?</label>
+                    <input type="text" id="contato_1prof_ef" name="contato_1prof_ef">
+                </div>
+                <div class="field-group">
+                    <label for="periodo_alfabetizacao">Como foi a alfabetização?</label>
+                    <input type="text" id="periodo_alfabetizacao" name="periodo_alfabetizacao">
+                </div>
+                <div class="field-group">
+                    <label for="quando_alfabetizacao">Quando ocorreu?</label>
+                    <input type="text" id="quando_alfabetizacao" name="quando_alfabetizacao">
+                </div>
+                
+                <div class="field-group full-width">
+                    <label for="evolucao_aprendizagem">Evolução da aprendizagem?</label>
+                    <textarea id="evolucao_aprendizagem" name="evolucao_aprendizagem" rows="2"></textarea>
+                </div>
+
+                <div class="field-group full-width">
+                    <div class="nested-grid nested-grid-4">
+                        <div class="field-group">
+                            <label for="reprovacao">Houve reprovação?</label>
+                            <input type="text" id="reprovacao" name="reprovacao">
+                        </div>
+                        <div class="field-group">
+                            <label for="motivo_reprovacao">Por quê?</label>
+                            <input type="text" id="motivo_reprovacao" name="motivo_reprovacao">
+                        </div>
+                        <div class="field-group">
+                            <label for="mudanca_escola">Houve mudanças de escola?</label>
+                            <input type="text" id="mudanca_escola" name="mudanca_escola">
+                        </div>
+                        <div class="field-group">
+                            <label for="motivo_mudanca_escola">Por quê?</label>
+                            <input type="text" id="motivo_mudanca_escola" name="motivo_mudanca_escola">
+                        </div>
+                    </div>
+                </div>
+            </div>
+                
+            <label style="margin-top: 15px; display: block;">Histórico Escolar:</label>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Ano</th>
+                        <th>Série</th>
+                        <th>Escola</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td><input type="text" name="hist_ano1"></td>
+                        <td><input type="text" name="hist_serie1"></td>
+                        <td><input type="text" name="hist_escola1"></td>
+                    </tr>
+                    <tr>
+                        <td><input type="text" name="hist_ano2"></td>
+                        <td><input type="text" name="hist_serie2"></td>
+                        <td><input type="text" name="hist_escola2"></td>
+                    </tr>
+                </tbody>
+            </table>
+            
+            <div class="form-grid" style="margin-top: 15px;">
+                <div class="field-group full-width">
+                    <label for="relacao_tarefas">Como se relaciona com as tarefas escolares?</label>
+                    <textarea id="relacao_tarefas" name="relacao_tarefas" rows="2"></textarea>
+                </div>
+                <div class="field-group full-width">
+                    <label for="materias_dificuldade">Quais as matérias que tem mais dificuldade?</label>
+                    <input type="text" id="materias_dificuldade" name="materias_dificuldade">
+                </div>
+                <div class="field-group full-width">
+                    <label for="ajuda_pais_casa">Como os pais ajudam em casa?</label>
+                    <textarea id="ajuda_pais_casa" name="ajuda_pais_casa" rows="2"></textarea>
+                </div>
+                <div class="field-group full-width">
+                    <label for="atitude_crianca_notas">Qual a atitude da criança frente as notas?</label>
+                    <textarea id="atitude_crianca_notas" name="atitude_crianca_notas" rows="2"></textarea>
+                </div>
+                <div class="field-group full-width">
+                    <label for="atitude_pais_notas">Qual a atitude dos pais frente as notas?</label>
+                    <textarea id="atitude_pais_notas" name="atitude_pais_notas" rows="2"></textarea>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- 16) Doenças -->
+        <fieldset>
+            <legend>16) Doenças</legend>
+            <div class="form-grid">
+                <div class="field-group full-width">
+                    <div class="nested-grid nested-grid-3">
+                        <div class="field-group">
+                            <label for="doenca_nascimento">Doença no nascimento?</label>
+                            <input type="text" id="doenca_nascimento" name="doenca_nascimento">
+                        </div>
+                        <div class="field-group">
+                            <label for="doenca_cronica">Doença crônica?</label>
+                            <input type="text" id="doenca_cronica" name="doenca_cronica">
+                        </div>
+                        <div class="field-group">
+                            <label for="doenca_grave">Doença grave?</label>
+                            <input type="text" id="doenca_grave" name="doenca_grave">
+                        </div>
+                    </div>
+                </div>
+                <div class="field-group">
+                    <label for="exame_oftalmo">Exame com oftalmologista?</label>
+                    <input type="text" id="exame_oftalmo" name="exame_oftalmo">
+                </div>
+                <div class="field-group">
+                    <label for="resultado_oftalmo">Resultado:</label>
+                    <input type="text" id="resultado_oftalmo" name="resultado_oftalmo">
+                </div>
+                <div class="field-group">
+                    <label for="exame_ortopedista">Exame com ortopedista?</label>
+                    <input type="text" id="exame_ortopedista" name="exame_ortopedista">
+                </div>
+                <div class="field-group">
+                    <label for="resultado_ortopedista">Resultado:</label>
+                    <input type="text" id="resultado_ortopedista" name="resultado_ortopedista">
+                </div>
+                <div class="field-group full-width">
+                    <label for="acidente">Teve algum acidente?</label>
+                    <textarea id="acidente" name="acidente" rows="2"></textarea>
+                </div>
+                <div class="field-group full-width">
+                    <label for="medicacao_atual">Toma alguma medicação?</label>
+                    <textarea id="medicacao_atual" name="medicacao_atual" rows="2"></textarea>
+                </div>
+                <div class="field-group full-width">
+                    <label>Acompanhamento com neurologista:</label>
+                    <div class="nested-grid nested-grid-4">
+                        <div class="field-group">
+                            <label for="neuro_acompanhamento">Faz?</label>
+                            <input type="text" id="neuro_acompanhamento" name="neuro_acompanhamento">
+                        </div>
+                        <div class="field-group">
+                            <label for="neuro_ha_quanto_tempo">Há quanto tempo?</label>
+                            <input type="text" id="neuro_ha_quanto_tempo" name="neuro_ha_quanto_tempo">
+                        </div>
+                        <div class="field-group">
+                            <label for="neuro_profissional">Profissional?</label>
+                            <input type="text" id="neuro_profissional" name="neuro_profissional">
+                        </div>
+                        <div class="field-group">
+                            <label for="neuro_telefone">Telefone?</label>
+                            <input type="tel" id="neuro_telefone" name="neuro_telefone">
+                        </div>
+                    </div>
+                </div>
+                <div class="field-group full-width">
+                    <div class="nested-grid nested-grid-3">
+                        <div class="field-group">
+                            <label for="estado_fisico">Como está fisicamente?</label>
+                            <input type="text" id="estado_fisico" name="estado_fisico">
+                        </div>
+                        <div class="field-group">
+                            <label for="altura_atual">Altura atual?</label>
+                            <input type="text" id="altura_atual" name="altura_atual">
+                        </div>
+                        <div class="field-group">
+                            <label for="peso_atual">Peso atual?</label>
+                            <input type="text" id="peso_atual" name="peso_atual">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </fieldset>
+        
+        <!-- 17) Hábitos e valores da família -->
+        <fieldset>
+            <legend>17) Hábitos e valores da família</legend>
+            <div class="form-grid">
+                <div class="field-group full-width">
+                    <label for="religiao">Seguem alguma religião?</label>
+                    <input type="text" id="religiao" name="religiao">
+                </div>
+                <div class="field-group full-width">
+                    <label for="diferencas_religiao">Como lidam com as diferenças de religião, caso existam?</label>
+                    <textarea id="diferencas_religiao" name="diferencas_religiao" rows="2"></textarea>
+                </div>
+                <div class="field-group full-width">
+                    <label for="metodos_disciplinares">Quais são os métodos disciplinares?</label>
+                    <textarea id="metodos_disciplinares" name="metodos_disciplinares" rows="2"></textarea>
+                </div>
+                <div class="field-group full-width">
+                    <label for="diferencas_disciplinares">Como lidam com os métodos disciplinares diferentes, caso existam?</label>
+                    <textarea id="diferencas_disciplinares" name="diferencas_disciplinares" rows="2"></textarea>
+                </div>
+                <div class="field-group full-width">
+                    <label for="rotina_semana">Descreva a rotina da criança em um dia de semana comum:</label>
+                    <textarea id="rotina_semana" name="rotina_semana" rows="3"></textarea>
+                </div>
+                <div class="field-group full-width">
+                    <label for="rotina_fim_semana">Descreva um dia na vida da criança no fim de semana:</label>
+                    <textarea id="rotina_fim_semana" name="rotina_fim_semana" rows="3"></textarea>
+                </div>
+                <div class="field-group">
+                    <label for="ferias">Como a criança passa as férias?</label>
+                    <input type="text" id="ferias" name="ferias">
+                </div>
+                <div class="field-group">
+                    <label for="amigos">Quem são os amigos da criança?</label>
+                    <input type="text" id="amigos" name="amigos">
+                </div>
+                <div class="field-group">
+                    <label for="brinca_fora">Costuma brincar fora de casa?</label>
+                    <input type="text" id="brinca_fora" name="brinca_fora">
+                </div>
+                <div class="field-group">
+                    <label for="traz_amigos">Traz amigos para casa?</label>
+                    <input type="text" id="traz_amigos" name="traz_amigos">
+                </div>
+                <div class="field-group">
+                    <label for="dorme_fora_amigos">Dorme na casa de amigos?</label>
+                    <input type="text" id="dorme_fora_amigos" name="dorme_fora_amigos">
+                </div>
+                <div class="field-group">
+                    <label for="dorme_fora_familia">Dorme na casa de familiares?</label>
+                    <input type="text" id="dorme_fora_familia" name="dorme_fora_familia">
+                </div>
+                <div class="field-group full-width">
+                    <label for="aniversarios">Como são comemorados os aniversários?</label>
+                    <textarea id="aniversarios" name="aniversarios" rows="2"></textarea>
+                </div>
+                <div class="field-group">
+                    <label for="escolaridade_pai_relato">Como foi a escolaridade do pai?</label>
+                    <input type="text" id="escolaridade_pai_relato" name="escolaridade_pai_relato">
+                </div>
+                <div class="field-group">
+                    <label for="escolaridade_mae_relato">Como foi a escolaridade da mãe?</label>
+                    <input type="text" id="escolaridade_mae_relato" name="escolaridade_mae_relato">
+                </div>
+                <div class="field-group full-width">
+                    <label for="opiniao_escola">O que pensam a respeito da escola?</label>
+                    <textarea id="opiniao_escola" name="opiniao_escola" rows="2"></textarea>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- 18) Sexualidade -->
+        <fieldset>
+            <legend>18) Sexualidade</legend>
+            <div class="form-grid">
+                <div class="field-group">
+                    <label for="perguntas_gravidez">Quando perguntou sobre gravidez?</label>
+                    <input type="text" id="perguntas_gravidez" name="perguntas_gravidez">
+                </div>
+                <div class="field-group">
+                    <label for="perguntas_diferencas_sexuais">Quando perguntou sobre diferenças sexuais?</label>
+                    <input type="text" id="perguntas_diferencas_sexuais" name="perguntas_diferencas_sexuais">
+                </div>
+                <div class="field-group full-width">
+                    <label for="lidar_nudez">Como lidam com a nudez?</label>
+                    <textarea id="lidar_nudez" name="lidar_nudez" rows="2"></textarea>
+                </div>
+                <div class="field-group full-width">
+                    <label for="interesse_sexualidade">Manifesta interesse por saber a respeito da sexualidade?</label>
+                    <textarea id="interesse_sexualidade" name="interesse_sexualidade" rows="2"></textarea>
+                </div>
+                <div class="field-group full-width">
+                    <label for="preocupacao_sexualidade">Manifesta algo sobre sexualidade que os preocupe?</label>
+                    <textarea id="preocupacao_sexualidade" name="preocupacao_sexualidade" rows="2"></textarea>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- 19) Acontecimentos importantes -->
+        <fieldset>
+            <legend>19) Acontecimentos no primeiro ano de vida</legend>
+            <div class="form-grid">
+                <div class="field-group full-width">
+                    <label for="acontecimentos_casal">Algo importante no relacionamento do casal ou cônjuges nesse período?</label>
+                    <textarea id="acontecimentos_casal" name="acontecimentos_casal" rows="2"></textarea>
+                </div>
+                <div class="field-group full-width">
+                    <label for="perda_significativa">Houve alguma perda significativa que abalou a família?</label>
+                    <textarea id="perda_significativa" name="perda_significativa" rows="2"></textarea>
+                </div>
+            </div>
+        </fieldset>
+
+        <!-- 20) Encerramento -->
+        <fieldset>
+            <legend>20) Encerramento</legend>
+            <div class="form-grid">
+                <div class="field-group full-width">
+                    <label for="encerramento_comentarios">Gostariam de falar a respeito de algum assunto que não foi mencionado?</label>
+                    <textarea id="encerramento_comentarios" name="encerramento_comentarios" rows="4"></textarea>
+                </div>
+            </div>
+        </fieldset>
+
+    </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const form = document.getElementById('anamneseForm');
+            const saveButton = document.getElementById('saveButton');
+            const clearButton = document.getElementById('clearButton');
+            const saveStatus = document.getElementById('save-status');
+            const storageKey = 'anamneseFormData';
+            let clearTimeout = null;
+
+            // --- 1. Função para Salvar os Dados ---
+            const saveForm = (feedbackType = 'auto') => {
+                const formData = new FormData(form);
+                const data = Object.fromEntries(formData.entries());
+                
+                try {
+                    localStorage.setItem(storageKey, JSON.stringify(data));
+                    
+                    // Feedback visual
+                    if (feedbackType === 'manual') {
+                        saveStatus.textContent = 'Salvo manualmente!';
+                    } else if (feedbackType === 'auto') {
+                        saveStatus.textContent = 'Salvo automaticamente...';
+                    }
+                    
+                    // Limpa a mensagem de status após 2 segundos
+                    setTimeout(() => { saveStatus.textContent = ''; }, 2000);
+
+                } catch (error) {
+                    console.error("Erro ao salvar no localStorage:", error);
+                    saveStatus.textContent = 'Erro ao salvar. O armazenamento pode estar cheio.';
+                }
+            };
+
+            // --- 2. Função para Carregar os Dados ---
+            const loadForm = () => {
+                const dataJSON = localStorage.getItem(storageKey);
+                if (!dataJSON) {
+                    console.log("Nenhum dado salvo encontrado.");
+                    return;
+                }
+
+                try {
+                    const data = JSON.parse(dataJSON);
+                    
+                    for (const key in data) {
+                        if (Object.hasOwnProperty.call(data, key)) {
+                            const value = data[key];
+                            const elements = form.elements[key]; // Pode ser um único elemento ou uma NodeList
+
+                            if (!elements) continue;
+
+                            // Se for uma NodeList (ex: radio buttons)
+                            if (elements.length && elements.nodeName === undefined) { 
+                                elements.forEach(el => {
+                                    if (el.type === 'radio' && el.value === value) {
+                                        el.checked = true;
+                                    }
+                                    // Adicionar lógica para checkboxes aqui se necessário
+                                    // else if (el.type === 'checkbox') { ... }
+                                });
+                            } else { // Se for um único elemento
+                                // Previne erro em rádios únicos (embora incomum)
+                                if (elements.type !== 'radio') {
+                                    elements.value = value;
+                                }
+                            }
+                        }
+                    }
+                    console.log("Formulário carregado do localStorage.");
+                } catch (error) {
+                    console.error("Erro ao carregar dados do localStorage:", error);
+                    saveStatus.textContent = 'Erro ao carregar dados salvos.';
+                }
+            };
+
+            // --- 3. Função para Limpar os Dados ---
+            const clearForm = () => {
+                if (clearButton.dataset.confirmed === 'true') {
+                    // Executa a limpeza
+                    form.reset();
+                    localStorage.removeItem(storageKey);
+                    console.log("Formulário e dados salvos foram limpos.");
+                    saveStatus.textContent = 'Formulário limpo!';
+                    
+                    // Reseta o botão
+                    clearButton.dataset.confirmed = 'false';
+                    clearButton.textContent = 'Limpar Formulário';
+                    clearButton.classList.remove('button-danger-confirm');
+                    if(clearTimeout) clearTimeout(clearTimeout);
+                    
+                    setTimeout(() => { saveStatus.textContent = ''; }, 2000);
+
+                } else {
+                    // Pede confirmação
+                    clearButton.dataset.confirmed = 'true';
+                    clearButton.textContent = 'Clique novamente para confirmar!';
+                    clearButton.classList.add('button-danger-confirm');
+                    
+                    // Reseta o botão após 5 segundos
+                    clearTimeout = setTimeout(() => {
+                        clearButton.dataset.confirmed = 'false';
+                        clearButton.textContent = 'Limpar Formulário';
+                        clearButton.classList.remove('button-danger-confirm');
+                    }, 5000);
+                }
+            };
+
+            // --- 4. Anexar Eventos ---
+            
+            // Carregar dados ao iniciar
+            loadForm();
+
+            // Salvar manualmente
+            saveButton.addEventListener('click', () => saveForm('manual'));
+            
+            // Limpar formulário
+            clearButton.addEventListener('click', clearForm);
+
+            // Salvamento automático a cada 1 minuto (60000 ms)
+            setInterval(() => saveForm('auto'), 60000);
+
+            // [Opcional] Salvar ao digitar (pode ser pesado, mas é uma alternativa)
+            // form.addEventListener('input', () => saveForm('auto')); 
+
+        });
+    </script>
+
+</body>
+</html>
+
