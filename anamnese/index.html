@@ -15,6 +15,16 @@
             padding: 20px;
         }
 
+        .header {
+            text-align: center;
+            margin-bottom: 10px;
+        }
+        .form-logo {
+            width: 120px;
+            height: auto;
+            border-radius: 8px; /* Opcional: para suavizar as bordas */
+        }
+
         h1 {
             text-align: center;
             color: #2c3e50;
@@ -176,6 +186,7 @@
         .print-button {
             display: block;
             width: 250px;
+            margin: 30px auto 10px;
             padding: 12px;
             background-color: #007bff;
             color: white;
@@ -254,6 +265,10 @@
                 padding: 15px; /* Reduz padding do formulário */
             }
 
+            .form-logo {
+                width: 100px; /* Logo menor no mobile */
+            }
+
             h1 {
                 font-size: 1.6em; /* Tamanho de título menor */
             }
@@ -312,6 +327,14 @@
                 font-size: 9pt;
                 font-family: 'Times New Roman', Times, serif;
                 line-height: 1.4;
+            }
+
+            .header {
+                text-align: center;
+                page-break-after: avoid;
+            }
+            .form-logo {
+                width: 100px; /* Logo menor para impressão */
             }
 
             h1 { font-size: 16pt; }
@@ -404,6 +427,9 @@
 </head>
 <body>
 
+    <div class="header">
+        <img src="https://i.imgur.com/o5oUYBy.jpeg" alt="Logotipo" class="form-logo">
+    </div>
     <h1>Formulário de Anamnese</h1>
 
     <div class="button-container">
@@ -1610,4 +1636,3 @@
 
 </body>
 </html>
-
